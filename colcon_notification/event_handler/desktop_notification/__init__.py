@@ -87,5 +87,5 @@ class DesktopNotificationEventHandler(EventHandlerExtensionPoint):
             else:
                 notify(
                     '`{context.command_name} {context.args.verb_name}` '
-                    'with <i>stderr</i> output'.format_map(self.__dict__),
+                    'with stderr output'.format_map(self.__dict__),
                     os.getcwd(), Result.warning)
