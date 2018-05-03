@@ -8,6 +8,7 @@ from colcon_core.event.job import JobEnded
 from colcon_core.event.job import JobQueued
 from colcon_core.event.job import JobSkipped
 from colcon_core.event.output import StderrLine
+from colcon_core.event.test import TestFailure
 from colcon_core.event_handler import EventHandlerExtensionPoint
 from colcon_core.plugin_system import satisfies_version
 from colcon_core.subprocess import SIGINT_RESULT
@@ -24,6 +25,7 @@ class DesktopNotificationEventHandler(EventHandlerExtensionPoint):
     - :py:class:`colcon_core.event.job.JobQueued`
     - :py:class:`colcon_core.event.job.JobEnded`
     - :py:class:`colcon_core.event.job.JobSkipped`
+    - :py:class:`colcon_core.event.test.TestFailure`
     """
 
     # the priority should be lower than all status and notification extensions
@@ -36,6 +38,7 @@ class DesktopNotificationEventHandler(EventHandlerExtensionPoint):
             EventHandlerExtensionPoint.EXTENSION_POINT_VERSION, '^1.0')
         self._start_time = time.time()
         self._any_stderr_output = False
+        self._any_test_failure = False
         self._pending_count = 0
         self._failed = []
         self._all_failed_aborted = True
@@ -48,6 +51,9 @@ class DesktopNotificationEventHandler(EventHandlerExtensionPoint):
 
         elif isinstance(data, StderrLine):
             self._any_stderr_output = True
+
+        elif isinstance(data, TestFailure):
+            self._any_test_failure = True
 
         elif isinstance(data, JobEnded):
             self._pending_count -= 1
@@ -79,13 +85,20 @@ class DesktopNotificationEventHandler(EventHandlerExtensionPoint):
                     '{label} ({pkg_info})'.format(
                         label=label, pkg_info=pkg_info, **self.__dict__),
                     os.getcwd(), result)
-            elif not self._any_stderr_output:
+            elif not self._any_stderr_output and not self._any_test_failure:
                 notify(
                     '`{context.command_name} {context.args.verb_name}` '
                     'successful'.format_map(self.__dict__),
                     os.getcwd(), Result.success)
             else:
+                msg_suffix = []
+                if self._any_stderr_output:
+                    msg_suffix.append('stderr output')
+                if self._any_test_failure:
+                    msg_suffix.append('test failures')
+                msg_suffix = ' and '.join(msg_suffix)
                 notify(
                     '`{context.command_name} {context.args.verb_name}` '
-                    'with stderr output'.format_map(self.__dict__),
+                    .format_map(self.__dict__) +
+                    'with {msg_suffix}'.format_map(locals()),
                     os.getcwd(), Result.warning)
