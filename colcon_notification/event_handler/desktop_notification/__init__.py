@@ -5,11 +5,10 @@ import os
 import time
 
 from colcon_core.event.job import JobEnded
-from colcon_core.event.job import JobQueued
-from colcon_core.event.job import JobSkipped
 from colcon_core.event.output import StderrLine
 from colcon_core.event.test import TestFailure
 from colcon_core.event_handler import EventHandlerExtensionPoint
+from colcon_core.event_reactor import EventReactorShutdown
 from colcon_core.plugin_system import satisfies_version
 from colcon_core.subprocess import SIGINT_RESULT
 from colcon_notification.desktop_notification import notify
@@ -22,9 +21,7 @@ class DesktopNotificationEventHandler(EventHandlerExtensionPoint):
 
     The extension handles events of the following types:
     - :py:class:`colcon_core.event.output.StderrLine`
-    - :py:class:`colcon_core.event.job.JobQueued`
     - :py:class:`colcon_core.event.job.JobEnded`
-    - :py:class:`colcon_core.event.job.JobSkipped`
     - :py:class:`colcon_core.event.test.TestFailure`
     """
 
@@ -39,37 +36,26 @@ class DesktopNotificationEventHandler(EventHandlerExtensionPoint):
         self._start_time = time.time()
         self._any_stderr_output = False
         self._any_test_failure = False
-        self._pending_count = 0
         self._failed = []
         self._all_failed_aborted = True
 
     def __call__(self, event):  # noqa: D102
         data = event[0]
 
-        if isinstance(data, JobQueued):
-            self._pending_count += 1
-
-        elif isinstance(data, StderrLine):
+        if isinstance(data, StderrLine):
             self._any_stderr_output = True
 
         elif isinstance(data, TestFailure):
             self._any_test_failure = True
 
         elif isinstance(data, JobEnded):
-            self._pending_count -= 1
             if data.rc:
                 job = event[1]
                 self._failed.append(job)
                 if data.rc != SIGINT_RESULT:
                     self._all_failed_aborted = False
 
-        elif isinstance(data, JobSkipped):
-            self._pending_count -= 1
-
-        if (
-            (isinstance(data, JobEnded) or isinstance(data, JobSkipped)) and
-            not self._pending_count
-        ):
+        elif isinstance(data, EventReactorShutdown):
             if self._failed:
                 pkg_info = self._failed[0].task.context.pkg.name
                 if len(self._failed) > 1:
