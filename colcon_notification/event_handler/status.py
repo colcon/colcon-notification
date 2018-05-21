@@ -14,6 +14,7 @@ from colcon_core.event.job import JobStarted
 from colcon_core.event.output import StdoutLine
 from colcon_core.event.timer import TimerEvent
 from colcon_core.event_handler import EventHandlerExtensionPoint
+from colcon_core.event_reactor import EventReactorShutdown
 from colcon_core.plugin_system import satisfies_version
 
 
@@ -28,6 +29,7 @@ class StatusEventHandler(EventHandlerExtensionPoint):
     - :py:class:`colcon_core.event.job.JobQueued`
     - :py:class:`colcon_core.event.job.JobStarted`
     - :py:class:`colcon_core.event.timer.TimerEvent`
+    - :py:class:`colcon_core.event_reactor.EventReactorShutdown`
     """
 
     # the priority should be lower than other extensions
@@ -147,3 +149,7 @@ class StatusEventHandler(EventHandlerExtensionPoint):
 
             print(msg, end='\r')
             self._last_status_line_length = len(msg)
+
+        elif isinstance(data, EventReactorShutdown):
+            self._clear_last_status_line()
+            atexit.unregister(self._clear_last_status_line)
