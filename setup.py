@@ -12,23 +12,32 @@ from setuptools.command.develop import develop
 from setuptools.command.install import install
 
 src_base = 'colcon-terminal-notifier.app'
-dst_base = 'share/colcon-notification'
+data_files = (
+    ('share/colcon-notification/colcon-terminal-notifier.app/Contents', [
+        'colcon-terminal-notifier.app/Contents/Info.plist',
+        'colcon-terminal-notifier.app/Contents/PkgInfo']),
+    ('share/colcon-notification/colcon-terminal-notifier.app/Contents/MacOS', [
+        'colcon-terminal-notifier.app/Contents/MacOS/colcon-terminal-notifier']),
+    ('share/colcon-notification/colcon-terminal-notifier.app/Contents/Resources', [
+        'colcon-terminal-notifier.app/Contents/Resources/colcon.icns']),
+    ('share/colcon-notification/colcon-terminal-notifier.app/Contents/Resources/en.lproj', [
+        'colcon-terminal-notifier.app/Contents/Resources/en.lproj/Credits.rtf',
+        'colcon-terminal-notifier.app/Contents/Resources/en.lproj/InfoPlist.strings',
+        'colcon-terminal-notifier.app/Contents/Resources/en.lproj/MainMenu.nib']),
+)
 
-data_files = []
-for dirpath, dirnames, filenames in os.walk(src_base):
-    # skip subdirectories starting with a dot
-    dirnames[:] = filter(lambda d: not d.startswith('.'), dirnames)
-    dirnames.sort()
-
-    # nothing to do for directories without files
-    if not filenames:
-        continue
-
-    data_files.append((
-        os.path.join(dst_base, dirpath),
-        [
-            os.path.join(dirpath, name)
-            for name in sorted(filenames)]))
+src_base_offset = None
+dst_prefix = None
+if not os.path.exists(src_base):
+    # assuming this is a deb_dist build
+    if os.path.exists(os.path.join('..', '..', src_base)):
+        # use source base offset for data files
+        for _, srcs in data_files:
+            for i, src in enumerate(srcs):
+                srcs[i] = os.path.join('..', '..', src)
+        # use dst prefix for data files
+        dst_prefix = os.path.join(
+            os.getcwd(), 'debian/python3-colcon-notification')
 
 
 # in order to be referenced from the colcon.pkg file
@@ -66,8 +75,11 @@ class CustomInstallCommand(install):
 
     def run(self):
         global data_files
-        # https://github.com/pypa/setuptools/blob/f7ac232981d3d01e3c76890ae28da75859790dbe/setuptools/command/install.py#L63-L67
-        if not self._called_from_setup(inspect.currentframe()):
+        # https://github.com/pypa/setuptools/blob/52aacd5b276fedd6849c3a648a0014f5da563e93/setuptools/command/install.py#L59-L67
+        # Explicit request for old-style install?  Just do it
+        if self.old_and_unmanageable or self.single_version_externally_managed:
+            distutils_install.install.run(self)
+        elif not self._called_from_setup(inspect.currentframe()):
             # Run in backward-compatibility mode to support bdist_* commands.
             distutils_install.install.run(self)
         else:
@@ -80,17 +92,14 @@ class CustomInstallCommand(install):
 
 
 def _foreach_data_file(command, data_files, msg, callback):
+    global dst_prefix
     for dst_dir, srcs in data_files:
+        if command.prefix is not None:
+            dst_dir = os.path.join(command.prefix, dst_dir)
+        if dst_prefix:
+            dst_dir = os.path.join(dst_prefix) + dst_dir
         for src in srcs:
-            if command.prefix is not None:
-                dst_dir = os.path.join(command.prefix, dst_dir)
             dst = os.path.join(dst_dir, os.path.basename(src))
-            try:
-                src = os.path.join(
-                    os.path.dirname(os.path.realpath('setup.py')),
-                    src)
-            except OSError:
-                pass
             print(msg.format_map(locals()))
             if not command.dry_run:
                 callback(src, dst_dir, dst)
