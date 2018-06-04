@@ -128,6 +128,10 @@ class StatusEventHandler(EventHandlerExtensionPoint):
             if failed_jobs:
                 blocks.append('[%d failed]' % len(failed_jobs))
 
+            # number of ongoing jobs if greater one
+            if len(self._running) > 1:
+                blocks.append('[%d ongoing]' % len(self._running))
+
             # job identifier, label and time for ongoings jobs
             for job, d in self._running.items():
                 msg = job.task.context.pkg.name
