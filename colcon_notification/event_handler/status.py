@@ -22,6 +22,8 @@ class StatusEventHandler(EventHandlerExtensionPoint):
     """
     Continuously update a status line.
 
+    The extension is only enabled by default if stdout is a tty-like device.
+
     The extension handles events of the following types:
     - :py:class:`colcon_core.event.output.StdoutLine`
     - :py:class:`colcon_core.event.job.JobEnded`
@@ -40,6 +42,9 @@ class StatusEventHandler(EventHandlerExtensionPoint):
         super().__init__()
         satisfies_version(
             EventHandlerExtensionPoint.EXTENSION_POINT_VERSION, '^1.0')
+
+        self.enabled = sys.stdout.isatty()
+
         self._start_time = time.time()
         self._queued_count = 0
         self._running = {}
