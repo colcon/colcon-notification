@@ -16,6 +16,7 @@ from colcon_core.event.timer import TimerEvent
 from colcon_core.event_handler import EventHandlerExtensionPoint
 from colcon_core.event_reactor import EventReactorShutdown
 from colcon_core.plugin_system import satisfies_version
+from colcon_core.subprocess import SIGINT_RESULT
 
 
 class StatusEventHandler(EventHandlerExtensionPoint):
@@ -129,7 +130,9 @@ class StatusEventHandler(EventHandlerExtensionPoint):
                 (len(self._ended), self._queued_count))
 
             # number of failed jobs if not zero
-            failed_jobs = [j for j, d in self._ended.items() if d['rc']]
+            failed_jobs = [
+                j for j, d in self._ended.items()
+                if d['rc'] and d['rc'] != SIGINT_RESULT]
             if failed_jobs:
                 blocks.append('[%d failed]' % len(failed_jobs))
 
@@ -137,7 +140,7 @@ class StatusEventHandler(EventHandlerExtensionPoint):
             if len(self._running) > 1:
                 blocks.append('[%d ongoing]' % len(self._running))
 
-            # job identifier, label and time for ongoings jobs
+            # job identifier, label and time for ongoing jobs
             for job, d in self._running.items():
                 msg = job.task.context.pkg.name
                 if 'progress' in d:
