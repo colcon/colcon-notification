@@ -11,22 +11,23 @@ from setuptools import setup
 from setuptools.command.develop import develop
 from setuptools.command.install import install
 
-src_base = 'colcon-terminal-notifier.app'
+# by placing the app inside the Python module directory
+# it is ensured that it can be accessed during the out-of-source build
+src_base = os.path.join('colcon_notification', 'colcon-terminal-notifier.app')
 data_files = (
     ('share/colcon-notification/colcon-terminal-notifier.app/Contents', [
-        'colcon-terminal-notifier.app/Contents/Info.plist',
-        'colcon-terminal-notifier.app/Contents/PkgInfo']),
+        'colcon_notification/colcon-terminal-notifier.app/Contents/Info.plist',
+        'colcon_notification/colcon-terminal-notifier.app/Contents/PkgInfo']),
     ('share/colcon-notification/colcon-terminal-notifier.app/Contents/MacOS', [
-        'colcon-terminal-notifier.app/Contents/MacOS/colcon-terminal-notifier']),
+        'colcon_notification/colcon-terminal-notifier.app/Contents/MacOS/colcon-terminal-notifier']),
     ('share/colcon-notification/colcon-terminal-notifier.app/Contents/Resources', [
-        'colcon-terminal-notifier.app/Contents/Resources/colcon.icns']),
+        'colcon_notification/colcon-terminal-notifier.app/Contents/Resources/colcon.icns']),
     ('share/colcon-notification/colcon-terminal-notifier.app/Contents/Resources/en.lproj', [
-        'colcon-terminal-notifier.app/Contents/Resources/en.lproj/Credits.rtf',
-        'colcon-terminal-notifier.app/Contents/Resources/en.lproj/InfoPlist.strings',
-        'colcon-terminal-notifier.app/Contents/Resources/en.lproj/MainMenu.nib']),
+        'colcon_notification/colcon-terminal-notifier.app/Contents/Resources/en.lproj/Credits.rtf',
+        'colcon_notification/colcon-terminal-notifier.app/Contents/Resources/en.lproj/InfoPlist.strings',
+        'colcon_notification/colcon-terminal-notifier.app/Contents/Resources/en.lproj/MainMenu.nib']),
 )
 
-src_base_offset = None
 dst_prefix = None
 if not os.path.exists(src_base):
     # assuming this is a deb_dist build
@@ -53,7 +54,7 @@ class CustomDevelopCommand(develop):
         if sys.platform != 'win32':
             _foreach_data_file(
                 self, data_files,
-                'Creating {dst_dir} (link to {src})',
+                'Creating {dst_dir}{os_sep}{src_basename} (link to {src})',
                 _link_data_file)
         else:
             _foreach_data_file(
@@ -93,13 +94,18 @@ class CustomInstallCommand(install):
 
 def _foreach_data_file(command, data_files, msg, callback):
     global dst_prefix
+    os_sep = os.sep
     for dst_dir, srcs in data_files:
         if command.prefix is not None:
             dst_dir = os.path.join(command.prefix, dst_dir)
         if dst_prefix:
             dst_dir = os.path.join(dst_prefix) + dst_dir
         for src in srcs:
-            dst = os.path.join(dst_dir, os.path.basename(src))
+            if command.prefix is not None:
+                # use absolute path for symlinks pointing to the build dir
+                src = os.path.join(os.getcwd(), src)
+            src_basename = os.path.basename(src)
+            dst = os.path.join(dst_dir, src_basename)
             print(msg.format_map(locals()))
             if not command.dry_run:
                 callback(src, dst_dir, dst)
