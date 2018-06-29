@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 import platform
 import subprocess
+import sys
 
 from colcon_core.logging import colcon_logger
 from colcon_core.plugin_system import satisfies_version
@@ -42,20 +43,25 @@ class TerminalNotifierDesktopNotification(DesktopNotificationExtensionPoint):
             return
 
         # determine the install prefix of this Python package
-        install_prefix = Path(entry_points[0].dist.location)
-        while install_prefix.name and install_prefix.name.lower() != 'lib':
-            install_prefix = install_prefix.parent
-        if install_prefix.name.lower() != 'lib':
+        install_prefix = _get_prefix_path(entry_points[0].dist.location)
+        if install_prefix is None:
+            # for develop installs the dist locations point to the build
+            # and the prefix path can't be determined
+            # instead search the sys.path
+            for path in sys.path:
+                path = _get_prefix_path(path)
+                if path is not None and _get_app_path(path):
+                    install_prefix = path
+                    break
+
+        if install_prefix is None:
             logger.error(
                 'Could not determine the install prefix of the '
                 'colcon-terminal-notifier.app')
             return
 
         cmd = [
-            'open',
-            str(
-                install_prefix.parent / 'share' / 'colcon-notification' /
-                'colcon-terminal-notifier.app'),
+            'open', str(_get_app_path(install_prefix)),
             '--args',
             '-message', message,
             '-title', title,
@@ -73,3 +79,20 @@ class TerminalNotifierDesktopNotification(DesktopNotificationExtensionPoint):
             cmd_str = ' '.join(cmd)
             logger.error(
                 "Failed to invoke '{cmd_str}'".format_map(locals()))
+
+
+def _get_prefix_path(path):
+    path = Path(path)
+    while path.name:
+        if path.name.lower() == 'lib':
+            return path.parent
+        path = path.parent
+    return None
+
+
+def _get_app_path(prefix_path):
+    app_path = prefix_path / 'share' / 'colcon-notification' / \
+        'colcon-terminal-notifier.app'
+    if app_path.exists():
+        return app_path
+    return None
