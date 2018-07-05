@@ -45,9 +45,9 @@ class TerminalNotifierDesktopNotification(DesktopNotificationExtensionPoint):
         # determine the install prefix of this Python package
         install_prefix = _get_prefix_path(entry_points[0].dist.location)
         if install_prefix is None:
-            # for develop installs the dist locations point to the build
+            # for 'develop' the dist location points to the build directory
             # and the prefix path can't be determined
-            # instead search the sys.path
+            # therefore searching the sys.path instead
             for path in sys.path:
                 path = _get_prefix_path(path)
                 if path is not None and _get_app_path(path):
