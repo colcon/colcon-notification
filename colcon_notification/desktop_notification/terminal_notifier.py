@@ -83,10 +83,8 @@ class TerminalNotifierDesktopNotification(DesktopNotificationExtensionPoint):
 
 def _get_prefix_path(path):
     path = Path(path)
-    while path.name:
-        if path.name.lower() == 'lib':
-            return path.parent
-        path = path.parent
+    if path.parents[1].name.lower() == 'lib':
+        return path.parents[2]
     return None
 
 
