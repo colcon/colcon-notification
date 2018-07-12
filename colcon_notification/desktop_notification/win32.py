@@ -4,10 +4,13 @@
 import sys
 import time
 
+from colcon_core.logging import colcon_logger
 from colcon_core.plugin_system import satisfies_version
 from colcon_core.plugin_system import SkipExtensionException
 from colcon_notification.desktop_notification \
     import DesktopNotificationExtensionPoint
+
+logger = colcon_logger.getChild(__name__)
 
 
 class Win32DesktopNotification(DesktopNotificationExtensionPoint):
@@ -32,8 +35,18 @@ class NotificationWindow:
     """Notification windows using the Win32 API."""
 
     def __init__(self, title, message, icon_path=None):  # noqa: D107
-        import win32con
-        import win32gui
+        try:
+            import win32con
+        except ImportError as e:
+            logger.debug(
+                '"Failed to import win32con: {e}'.format_map(locals()))
+            return
+        try:
+            import win32gui
+        except ImportError as e:
+            logger.debug(
+                '"Failed to import win32gui: {e}'.format_map(locals()))
+            return
 
         wc, class_atom = NotificationWindow._create_window_class()
 
