@@ -14,6 +14,7 @@ from colcon_core.event.job import JobStarted
 from colcon_core.event.output import StdoutLine
 from colcon_core.event.timer import TimerEvent
 from colcon_core.event_handler import EventHandlerExtensionPoint
+from colcon_core.event_handler import format_duration
 from colcon_core.event_reactor import EventReactorShutdown
 from colcon_core.plugin_system import satisfies_version
 from colcon_core.subprocess import SIGINT_RESULT
@@ -122,7 +123,9 @@ class StatusEventHandler(EventHandlerExtensionPoint):
             blocks = []
 
             # runtime in seconds
-            blocks.append('[%.1fs]' % (now - self._start_time))
+            duration_string = format_duration(
+                now - self._start_time, fixed_decimal_points=1)
+            blocks.append('[{duration_string}]'.format_map(locals()))
 
             # number of completed jobs / number of jobs
             blocks.append(
@@ -145,7 +148,10 @@ class StatusEventHandler(EventHandlerExtensionPoint):
                 msg = job.task.context.pkg.name
                 if 'progress' in d:
                     msg += ':%s' % ' '.join(d['progress'])
-                blocks.append('[%s - %.1fs]' % (msg, now - d['start_time']))
+                duration_string = format_duration(
+                    now - d['start_time'], fixed_decimal_points=1)
+                blocks.append(
+                    '[{msg} - {duration_string}]'.format_map(locals()))
 
             # determine blocks which fit into terminal width
             max_width = shutil.get_terminal_size().columns
