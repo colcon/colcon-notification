@@ -53,7 +53,7 @@ class StatusEventHandler(EventHandlerExtensionPoint):
         self._ended = {}
 
         # pattern to match progress indicator in e.g. make
-        self._progress_pattern = re.compile('^\[(  \d| \d\d|1\d\d)%\] ')
+        self._progress_pattern = re.compile(r'^\[(  \d| \d\d|1\d\d)%\] ')
 
         # decorate write methods for stdout / stderr
         # to clear the last status line before other output
