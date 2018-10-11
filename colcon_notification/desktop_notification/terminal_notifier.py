@@ -72,10 +72,10 @@ class TerminalNotifierDesktopNotification(DesktopNotificationExtensionPoint):
 
         try:
             subprocess.run(cmd, input=message.encode())
-        except FileNotFoundError as e:
+        except FileNotFoundError:
             logger.error(
                 "Failed to find 'colcon-terminal-notifier'")
-        except subprocess.CalledProcessError as e:
+        except subprocess.CalledProcessError:
             cmd_str = ' '.join(cmd)
             logger.error(
                 "Failed to invoke '{cmd_str}'".format_map(locals()))

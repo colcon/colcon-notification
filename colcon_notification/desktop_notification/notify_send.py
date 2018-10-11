@@ -40,7 +40,7 @@ class NotifySendDesktopNotification(DesktopNotificationExtensionPoint):
 
         try:
             subprocess.run(cmd)
-        except subprocess.CalledProcessError as e:
+        except subprocess.CalledProcessError:
             cmd_str = ' '.join(cmd)
             logger.error(
                 "Failed to invoke '{cmd_str}'".format_map(locals()))
