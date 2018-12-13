@@ -106,7 +106,7 @@ def notify(title, message, result):
             retval = extension.notify(
                 title=title, message=message, icon_path=icon_path)
             assert retval is None, 'notify() should return None'
-        except Exception as e:
+        except Exception as e:  # noqa: F841
             # catch exceptions raised in desktop notification extension
             exc = traceback.format_exc()
             logger.error(
