@@ -37,13 +37,13 @@ class NotificationWindow:
     def __init__(self, title, message, icon_path=None):  # noqa: D107
         try:
             import win32con
-        except ImportError as e:
+        except ImportError as e:  # noqa: F841
             logger.debug(
                 '"Failed to import win32con: {e}'.format_map(locals()))
             return
         try:
             import win32gui
-        except ImportError as e:
+        except ImportError as e:  # noqa: F841
             logger.debug(
                 '"Failed to import win32gui: {e}'.format_map(locals()))
             return
