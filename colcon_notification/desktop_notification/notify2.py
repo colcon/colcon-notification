@@ -37,7 +37,7 @@ class Notify2DesktopNotification(DesktopNotificationExtensionPoint):
                 notify2.init('colcon')
             except Exception as e:  # noqa: F841
                 logger.debug(
-                    '"Failed to initialize notify2: {e}'.format_map(locals()))
+                    'Failed to initialize notify2: {e}'.format_map(locals()))
                 return
             self._initialized = True
 
