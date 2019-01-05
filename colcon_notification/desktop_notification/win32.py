@@ -39,13 +39,13 @@ class NotificationWindow:
             import win32con
         except ImportError as e:  # noqa: F841
             logger.debug(
-                '"Failed to import win32con: {e}'.format_map(locals()))
+                'Failed to import win32con: {e}'.format_map(locals()))
             return
         try:
             import win32gui
         except ImportError as e:  # noqa: F841
             logger.debug(
-                '"Failed to import win32gui: {e}'.format_map(locals()))
+                'Failed to import win32gui: {e}'.format_map(locals()))
             return
 
         wc, class_atom = NotificationWindow._create_window_class()
