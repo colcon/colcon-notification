@@ -75,16 +75,21 @@ class NotificationWindow:
         # show the notification
         flags = win32gui.NIF_ICON | win32gui.NIF_MESSAGE | win32gui.NIF_TIP
         nid = (hwnd, 0, flags, win32con.WM_USER + 20, hicon, 'tooltip')
-        win32gui.Shell_NotifyIcon(
-            win32gui.NIM_ADD, nid)
-        win32gui.Shell_NotifyIcon(
-            win32gui.NIM_MODIFY, (
-                hwnd, 0, win32gui.NIF_INFO, win32con.WM_USER + 20, hicon,
-                'Balloon  tooltip', message, 200, title))
-
-        # wait a while before destroying the window
-        time.sleep(5)
-        win32gui.DestroyWindow(hwnd)
+        try:
+            win32gui.Shell_NotifyIcon(
+                win32gui.NIM_ADD, nid)
+            win32gui.Shell_NotifyIcon(
+                win32gui.NIM_MODIFY, (
+                    hwnd, 0, win32gui.NIF_INFO, win32con.WM_USER + 20, hicon,
+                    'Balloon  tooltip', message, 200, title))
+        except Exception as e:  # noqa: F841
+            logger.debug(
+                'Failed to show the notification: {e}'.format_map(locals()))
+        else:
+            # wait a while before destroying the window
+            time.sleep(5)
+        finally:
+            win32gui.DestroyWindow(hwnd)
 
     _wc = None
     _class_atom = None
