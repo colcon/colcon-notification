@@ -16,7 +16,8 @@ class TerminalTitleEventHandler(EventHandlerExtensionPoint):
     """
     Show status in the terminal title.
 
-    The extension is only enabled by default if stdout is a tty-like device.
+    The extension is only enabled by default if stdout is a tty-like device
+    and not a dumb terminal.
 
     The extension handles events of the following types:
     - :py:class:`colcon_core.event.job.JobQueued`
@@ -34,7 +35,7 @@ class TerminalTitleEventHandler(EventHandlerExtensionPoint):
             EventHandlerExtensionPoint.EXTENSION_POINT_VERSION, '^1.0')
 
         # Setting the title does not work in dumb terminals, i.e., Emacs
-        self.enabled = (sys.stdout.isatty() and os.getenv('TERM') != 'dumb')
+        self.enabled = sys.stdout.isatty() and os.getenv('TERM') != 'dumb'
 
         self._queued_count = 0
         self._ongoing_count = 0
