@@ -1,0 +1,38 @@
+Description: Remove the data_files from the setup.cfg file since the
+ Debian package doesn't need the colcon-terminal-notifier.app.
+Author: Dirk Thomas <web@dirk-thomas.net>
+
+--- setup.cfg	2019-06-04 20:00:00.000000000 -0800
++++ setup.cfg.patched	2019-06-04 20:00:00.000000000 -0800
+@@ -47,18 +47,19 @@
+ 	scspell3k>=2.2
+ zip_safe = false
+ 
+-[options.data_files]
+-share/colcon_notification/colcon-terminal-notifier.app/Contents = 
+-	colcon-terminal-notifier.app/Contents/Info.plist
+-	colcon-terminal-notifier.app/Contents/PkgInfo
+-share/colcon_notification/colcon-terminal-notifier.app/Contents/MacOS = 
+-	colcon-terminal-notifier.app/Contents/MacOS/colcon-terminal-notifier
+-share/colcon_notification/colcon-terminal-notifier.app/Contents/Resources = 
+-	colcon-terminal-notifier.app/Contents/Resources/colcon.icns
+-share/colcon_notification/colcon-terminal-notifier.app/Contents/Resources/en.lproj = 
+-	colcon-terminal-notifier.app/Contents/Resources/en.lproj/Credits.rtf
+-	colcon-terminal-notifier.app/Contents/Resources/en.lproj/InfoPlist.strings
+-	colcon-terminal-notifier.app/Contents/Resources/en.lproj/MainMenu.nib
++# the Debian package doesn't need the colcon-terminal-notifier.app
++# [options.data_files]
++# share/colcon_notification/colcon-terminal-notifier.app/Contents = 
++# 	colcon-terminal-notifier.app/Contents/Info.plist
++# 	colcon-terminal-notifier.app/Contents/PkgInfo
++# share/colcon_notification/colcon-terminal-notifier.app/Contents/MacOS = 
++# 	colcon-terminal-notifier.app/Contents/MacOS/colcon-terminal-notifier
++# share/colcon_notification/colcon-terminal-notifier.app/Contents/Resources = 
++# 	colcon-terminal-notifier.app/Contents/Resources/colcon.icns
++# share/colcon_notification/colcon-terminal-notifier.app/Contents/Resources/en.lproj = 
++# 	colcon-terminal-notifier.app/Contents/Resources/en.lproj/Credits.rtf
++# 	colcon-terminal-notifier.app/Contents/Resources/en.lproj/InfoPlist.strings
++# 	colcon-terminal-notifier.app/Contents/Resources/en.lproj/MainMenu.nib
+ 
+ [tool:pytest]
+ filterwarnings = 
