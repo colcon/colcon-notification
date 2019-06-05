@@ -60,6 +60,13 @@ class TerminalNotifierDesktopNotification(DesktopNotificationExtensionPoint):
                 'colcon-terminal-notifier.app')
             return
 
+        app_path = _get_app_path(install_prefix)
+        if app_path is None:
+            logger.error(
+                'Could not find the colcon-terminal-notifier.app in the '
+                "install prefix '{install_prefix}'".format_map(locals()))
+            return
+
         cmd = [
             'open', str(_get_app_path(install_prefix)),
             '--args',
