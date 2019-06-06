@@ -9,27 +9,27 @@ Author: Dirk Thomas <web@dirk-thomas.net>
  zip_safe = false
  
 -[options.data_files]
--share/colcon_notification/colcon-terminal-notifier.app/Contents = 
+-share/colcon_notification/colcon-terminal-notifier.app/contents = 
 -	colcon-terminal-notifier.app/Contents/Info.plist
 -	colcon-terminal-notifier.app/Contents/PkgInfo
--share/colcon_notification/colcon-terminal-notifier.app/Contents/MacOS = 
+-share/colcon_notification/colcon-terminal-notifier.app/contents/macos = 
 -	colcon-terminal-notifier.app/Contents/MacOS/colcon-terminal-notifier
--share/colcon_notification/colcon-terminal-notifier.app/Contents/Resources = 
+-share/colcon_notification/colcon-terminal-notifier.app/contents/resources = 
 -	colcon-terminal-notifier.app/Contents/Resources/colcon.icns
--share/colcon_notification/colcon-terminal-notifier.app/Contents/Resources/en.lproj = 
+-share/colcon_notification/colcon-terminal-notifier.app/contents/resources/en.lproj = 
 -	colcon-terminal-notifier.app/Contents/Resources/en.lproj/Credits.rtf
 -	colcon-terminal-notifier.app/Contents/Resources/en.lproj/InfoPlist.strings
 -	colcon-terminal-notifier.app/Contents/Resources/en.lproj/MainMenu.nib
 +# the Debian package doesn't need the colcon-terminal-notifier.app
 +# [options.data_files]
-+# share/colcon_notification/colcon-terminal-notifier.app/Contents = 
++# share/colcon_notification/colcon-terminal-notifier.app/contents = 
 +# 	colcon-terminal-notifier.app/Contents/Info.plist
 +# 	colcon-terminal-notifier.app/Contents/PkgInfo
-+# share/colcon_notification/colcon-terminal-notifier.app/Contents/MacOS = 
++# share/colcon_notification/colcon-terminal-notifier.app/contents/macos = 
 +# 	colcon-terminal-notifier.app/Contents/MacOS/colcon-terminal-notifier
-+# share/colcon_notification/colcon-terminal-notifier.app/Contents/Resources = 
++# share/colcon_notification/colcon-terminal-notifier.app/contents/resources = 
 +# 	colcon-terminal-notifier.app/Contents/Resources/colcon.icns
-+# share/colcon_notification/colcon-terminal-notifier.app/Contents/Resources/en.lproj = 
++# share/colcon_notification/colcon-terminal-notifier.app/contents/resources/en.lproj = 
 +# 	colcon-terminal-notifier.app/Contents/Resources/en.lproj/Credits.rtf
 +# 	colcon-terminal-notifier.app/Contents/Resources/en.lproj/InfoPlist.strings
 +# 	colcon-terminal-notifier.app/Contents/Resources/en.lproj/MainMenu.nib
