@@ -33,7 +33,6 @@ class DesktopNotificationEventHandler(EventHandlerExtensionPoint):
         super().__init__()
         satisfies_version(
             EventHandlerExtensionPoint.EXTENSION_POINT_VERSION, '^1.0')
-        self._start_time = time.time()
         self._any_stderr_output = False
         self._any_test_failure = False
         self._failed = []
