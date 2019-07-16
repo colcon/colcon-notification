@@ -47,7 +47,7 @@ class StatusEventHandler(EventHandlerExtensionPoint):
 
         self.enabled = sys.stdout.isatty()
 
-        self._start_time = time.time()
+        self._start_time = time.monotonic()
         self._queued_count = 0
         self._running = {}
         self._ended = {}
@@ -92,7 +92,7 @@ class StatusEventHandler(EventHandlerExtensionPoint):
         elif isinstance(data, JobStarted):
             job = event[1]
             assert job not in self._running
-            self._running[job] = {'start_time': time.time()}
+            self._running[job] = {'start_time': time.monotonic()}
 
         elif isinstance(data, JobProgress):
             job = event[1]
@@ -114,12 +114,12 @@ class StatusEventHandler(EventHandlerExtensionPoint):
         elif isinstance(data, JobEnded):
             job = event[1]
             self._ended[job] = self._running[job]
-            self._ended[job]['end_time'] = time.time()
+            self._ended[job]['end_time'] = time.monotonic()
             self._ended[job]['rc'] = data.rc
             del self._running[job]
 
         elif isinstance(data, TimerEvent):
-            now = time.time()
+            now = time.monotonic()
             blocks = []
 
             # runtime in seconds
