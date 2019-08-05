@@ -2,7 +2,6 @@
 # Licensed under the Apache License, Version 2.0
 
 import os
-import time
 
 from colcon_core.event.job import JobEnded
 from colcon_core.event.output import StderrLine
