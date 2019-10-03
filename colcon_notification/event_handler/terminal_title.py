@@ -58,7 +58,7 @@ class TerminalTitleEventHandler(EventHandlerExtensionPoint):
             self._update()
 
     def _update(self):
-        message = '{context.command_name} build ' \
+        message = '{context.command_name} {context.args.verb_name} ' \
             '[{_ended_count}/{_queued_count} done] ' \
             '[{_ongoing_count} ongoing]'.format_map(self.__dict__)
 
