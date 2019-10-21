@@ -117,5 +117,10 @@ class NotificationWindow:
     def _on_destroy(hwnd, msg, wparam, lparam):  # noqa: D102
         import win32gui
         nid = (hwnd, 0)
-        win32gui.Shell_NotifyIcon(win32gui.NIM_DELETE, nid)
+        try:
+            win32gui.Shell_NotifyIcon(win32gui.NIM_DELETE, nid)
+        except Exception as e:  # noqa: F841
+            logger.debug(
+                'Failed to delete the notification handle: {e}'
+                .format_map(locals()))
         win32gui.PostQuitMessage(0)
