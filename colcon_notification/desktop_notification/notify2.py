@@ -47,4 +47,5 @@ class Notify2DesktopNotification(DesktopNotificationExtensionPoint):
         else:
             self._last_notification.update(
                 title, message=message, icon=icon_path)
+        self._last_notification.set_hint('transient', True)
         self._last_notification.show()
