@@ -55,20 +55,21 @@ class StatusEventHandler(EventHandlerExtensionPoint):
         # pattern to match progress indicator in e.g. make
         self._progress_pattern = re.compile(r'^\[(  \d| \d\d|1\d\d)%\] ')
 
-        # decorate write methods for stdout / stderr
-        # to clear the last status line before other output
-        sys.stdout.write = self._write_and_last_clear_status_line(
-            sys.stdout.write)
-        sys.stdout.buffer.write = self._write_and_last_clear_status_line(
-            sys.stdout.buffer.write)
-        sys.stderr.write = self._write_and_last_clear_status_line(
-            sys.stderr.write)
-        sys.stderr.buffer.write = self._write_and_last_clear_status_line(
-            sys.stderr.buffer.write)
-        self._last_status_line_length = None
+        if self.enabled:
+            # decorate write methods for stdout / stderr
+            # to clear the last status line before other output
+            sys.stdout.write = self._write_and_last_clear_status_line(
+                sys.stdout.write)
+            sys.stdout.buffer.write = self._write_and_last_clear_status_line(
+                sys.stdout.buffer.write)
+            sys.stderr.write = self._write_and_last_clear_status_line(
+                sys.stderr.write)
+            sys.stderr.buffer.write = self._write_and_last_clear_status_line(
+                sys.stderr.buffer.write)
+            self._last_status_line_length = None
 
-        # register exit handle to ensure the last status line is cleared
-        atexit.register(self._clear_last_status_line)
+            # register exit handle to ensure the last status line is cleared
+            atexit.register(self._clear_last_status_line)
 
     def _write_and_last_clear_status_line(self, func):
         def wrapped_func(*args, **kwargs):
