@@ -7,6 +7,8 @@ import shutil
 import sys
 import time
 
+import colorama
+
 from colcon_core.event.job import JobEnded
 from colcon_core.event.job import JobProgress
 from colcon_core.event.job import JobQueued
@@ -42,6 +44,7 @@ class StatusEventHandler(EventHandlerExtensionPoint):
 
     def __init__(self):  # noqa: D107
         super().__init__()
+        colorama.init()
         satisfies_version(
             EventHandlerExtensionPoint.EXTENSION_POINT_VERSION, '^1.0')
 
@@ -136,33 +139,42 @@ class StatusEventHandler(EventHandlerExtensionPoint):
             # runtime in seconds
             duration_string = format_duration(
                 now - self._start_time, fixed_decimal_points=1)
-            blocks.append('[{duration_string}]'.format_map(locals()))
+            blocks.append('[' + colorama.Fore.YELLOW + duration_string +
+                          colorama.Fore.RESET + ']')
 
             # number of completed jobs / number of jobs
             blocks.append(
-                '[%d/%d complete]' %
-                (len(self._ended), self._queued_count))
+                '[' + colorama.Style.BRIGHT + colorama.Fore.GREEN +
+                str(len(self._ended)) + colorama.Style.RESET_ALL + '/' +
+                colorama.Fore.GREEN + str(self._queued_count) +
+                colorama.Fore.RESET + ' complete]')
 
             # number of failed jobs if not zero
             failed_jobs = [
                 j for j, d in self._ended.items()
                 if d['rc'] and d['rc'] != SIGINT_RESULT]
             if failed_jobs:
-                blocks.append('[%d failed]' % len(failed_jobs))
+                blocks.append('[' + colorama.Fore.RED + colorama.Style.BRIGHT +
+                              str(len(failed_jobs)) + colorama.Style.NORMAL +
+                              ' failed' + colorama.Fore.RESET + ']')
 
             # number of ongoing jobs if greater one
             if len(self._running) > 1:
-                blocks.append('[%d ongoing]' % len(self._running))
+                blocks.append('[' + colorama.Fore.GREEN +
+                              str(len(self._running)) + colorama.Fore.RESET +
+                              ' ongoing]')
 
             # job identifier, label and time for ongoing jobs
             for job, d in self._running.items():
-                msg = job.task.context.pkg.name
+                msg = (colorama.Fore.CYAN + job.task.context.pkg.name +
+                       colorama.Fore.RESET)
                 if 'progress' in d:
-                    msg += ':%s' % ' '.join(d['progress'])
+                    msg += (':' + colorama.Fore.BLUE + ' '.join(d['progress']) +
+                            colorama.Fore.RESET)
                 duration_string = format_duration(
                     now - d['start_time'], fixed_decimal_points=1)
-                blocks.append(
-                    '[{msg} - {duration_string}]'.format_map(locals()))
+                blocks.append('[' + msg + ' - ' + colorama.Fore.YELLOW +
+                              duration_string + colorama.Fore.RESET + ']')
 
             # determine blocks which fit into terminal width
             max_width = shutil.get_terminal_size().columns
