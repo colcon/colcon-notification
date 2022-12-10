@@ -53,7 +53,11 @@ class StatusEventHandler(EventHandlerExtensionPoint):
         self._ended = {}
 
         # pattern to match progress indicator in e.g. make
-        self._progress_pattern = re.compile(r'^\[(  \d| \d\d|1\d\d)%\] ')
+        self._progress_pattern_percentage = \
+            re.compile(r'^\[(  \d| \d\d|1\d\d)%\] ')
+        # pattern to match progress indicator in ninja ([X/Y])
+        self._progress_pattern_fraction = \
+            re.compile(r'^\[([0-9]+)\/([0-9]+)\] ')
 
         if self.enabled:
             # decorate write methods for stdout / stderr
@@ -103,14 +107,20 @@ class StatusEventHandler(EventHandlerExtensionPoint):
             line = data.line
             if isinstance(line, bytes):
                 line = line.decode(errors='replace')
-            match = self._progress_pattern.match(line)
-            if not match:
-                return
+            match_percentage = self._progress_pattern_percentage.match(line)
+            if not match_percentage:
+                match_fraction = self._progress_pattern_fraction.match(line)
+                if not match_fraction:
+                    return
             job = event[1]
             progress = self._running[job].get('progress', [])
             while len(progress) > 1:
                 progress.pop()
-            progress.append(match.group(1).lstrip() + '%')
+            if match_percentage:
+                progress.append(match_percentage.group(1).lstrip() + '%')
+            elif match_fraction:
+                progress.append('{:.0%}'.format(
+                    int(match_fraction.group(1))/int(match_fraction.group(2))))
 
         elif isinstance(data, JobEnded):
             job = event[1]
