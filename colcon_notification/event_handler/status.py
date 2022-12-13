@@ -22,6 +22,19 @@ from colcon_core.plugin_system import satisfies_version
 from colcon_core.subprocess import SIGINT_RESULT
 
 
+def _colorama_str_len(s):
+    in_code = False
+    l = 1
+    for c in s:
+        if c == '\033':
+            in_code = True
+        elif c == 'm' and in_code:
+            in_code = False
+        elif not in_code:
+            l += 1
+    return l
+
+
 class StatusEventHandler(EventHandlerExtensionPoint):
     """
     Continuously update a status line.
@@ -183,13 +196,13 @@ class StatusEventHandler(EventHandlerExtensionPoint):
                 # append dots when skipping at least one block
                 if i < len(blocks) - 1:
                     msg += ' ...'
-                if len(msg) < max_width:
+                if _colorama_str_len(msg) < max_width:
                     break
             else:
                 return
 
             print(msg, end='\r')
-            self._last_status_line_length = len(msg)
+            self._last_status_line_length = _colorama_str_len(msg)
 
         elif isinstance(data, EventReactorShutdown):
             self._clear_last_status_line()
