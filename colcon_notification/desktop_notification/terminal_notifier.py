@@ -97,7 +97,7 @@ def _get_prefix_path(path):
 
 def _get_app_path(prefix_path):
     app_path = prefix_path / 'share' / 'colcon_notification' / \
-        'colcon_terminal_notifier.app'
+        'colcon-terminal-notifier.app'
     if app_path.exists():
         return app_path
     return None
