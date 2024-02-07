@@ -18,7 +18,7 @@ logger = colcon_logger.getChild(__name__)
 
 
 class TerminalNotifierDesktopNotification(DesktopNotificationExtensionPoint):
-    """Use `colcon-terminal-notifier` to show notifications."""
+    """Use `colcon_terminal_notifier` to show notifications."""
 
     def __init__(self):  # noqa: D107
         super().__init__()
@@ -57,13 +57,13 @@ class TerminalNotifierDesktopNotification(DesktopNotificationExtensionPoint):
         if install_prefix is None:
             logger.error(
                 'Could not determine the install prefix of the '
-                'colcon-terminal-notifier.app')
+                'colcon_terminal_notifier.app')
             return
 
         app_path = _get_app_path(install_prefix)
         if app_path is None:
             logger.error(
-                'Could not find the colcon-terminal-notifier.app in the '
+                'Could not find the colcon_terminal_notifier.app in the '
                 "install prefix '{install_prefix}'".format_map(locals()))
             return
 
@@ -81,7 +81,7 @@ class TerminalNotifierDesktopNotification(DesktopNotificationExtensionPoint):
             subprocess.run(cmd, input=message.encode())
         except FileNotFoundError:
             logger.error(
-                "Failed to find 'colcon-terminal-notifier'")
+                "Failed to find 'colcon_terminal_notifier'")
         except subprocess.CalledProcessError:
             cmd_str = ' '.join(cmd)
             logger.error(

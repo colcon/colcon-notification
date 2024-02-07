@@ -1,5 +1,5 @@
 Description: Remove the data_files from the setup.cfg file since the
- Debian package doesn't need the colcon-terminal-notifier.app.
+ Debian package doesn't need the colcon_terminal_notifier.app.
 Author: Dirk Thomas <web@dirk-thomas.net>
 
 --- setup.cfg	2019-06-04 20:00:00.000000000 -0800
@@ -9,30 +9,30 @@ Author: Dirk Thomas <web@dirk-thomas.net>
  	scspell3k>=2.2
  
 -[options.data_files]
--share/colcon_notification/colcon-terminal-notifier.app/Contents = 
--	colcon-terminal-notifier.app/Contents/Info.plist
--	colcon-terminal-notifier.app/Contents/PkgInfo
--share/colcon_notification/colcon-terminal-notifier.app/Contents/MacOS = 
--	colcon-terminal-notifier.app/Contents/MacOS/colcon-terminal-notifier
--share/colcon_notification/colcon-terminal-notifier.app/Contents/Resources = 
--	colcon-terminal-notifier.app/Contents/Resources/colcon.icns
--share/colcon_notification/colcon-terminal-notifier.app/Contents/Resources/en.lproj = 
--	colcon-terminal-notifier.app/Contents/Resources/en.lproj/Credits.rtf
--	colcon-terminal-notifier.app/Contents/Resources/en.lproj/InfoPlist.strings
--	colcon-terminal-notifier.app/Contents/Resources/en.lproj/MainMenu.nib
-+# the Debian package doesn't need the colcon-terminal-notifier.app
+-share/colcon_notification/colcon_terminal_notifier.app/Contents = 
+-	colcon_terminal_notifier.app/Contents/Info.plist
+-	colcon_terminal_notifier.app/Contents/PkgInfo
+-share/colcon_notification/colcon_terminal_notifier.app/Contents/MacOS = 
+-	colcon_terminal_notifier.app/Contents/MacOS/colcon_terminal_notifier
+-share/colcon_notification/colcon_terminal_notifier.app/Contents/Resources = 
+-	colcon_terminal_notifier.app/Contents/Resources/colcon.icns
+-share/colcon_notification/colcon_terminal_notifier.app/Contents/Resources/en.lproj = 
+-	colcon_terminal_notifier.app/Contents/Resources/en.lproj/Credits.rtf
+-	colcon_terminal_notifier.app/Contents/Resources/en.lproj/InfoPlist.strings
+-	colcon_terminal_notifier.app/Contents/Resources/en.lproj/MainMenu.nib
++# the Debian package doesn't need the colcon_terminal_notifier.app
 +# [options.data_files]
-+# share/colcon_notification/colcon-terminal-notifier.app/Contents = 
-+# 	colcon-terminal-notifier.app/Contents/Info.plist
-+# 	colcon-terminal-notifier.app/Contents/PkgInfo
-+# share/colcon_notification/colcon-terminal-notifier.app/Contents/MacOS = 
-+# 	colcon-terminal-notifier.app/Contents/MacOS/colcon-terminal-notifier
-+# share/colcon_notification/colcon-terminal-notifier.app/Contents/Resources = 
-+# 	colcon-terminal-notifier.app/Contents/Resources/colcon.icns
-+# share/colcon_notification/colcon-terminal-notifier.app/Contents/Resources/en.lproj = 
-+# 	colcon-terminal-notifier.app/Contents/Resources/en.lproj/Credits.rtf
-+# 	colcon-terminal-notifier.app/Contents/Resources/en.lproj/InfoPlist.strings
-+# 	colcon-terminal-notifier.app/Contents/Resources/en.lproj/MainMenu.nib
++# share/colcon_notification/colcon_terminal_notifier.app/Contents = 
++# 	colcon_terminal_notifier.app/Contents/Info.plist
++# 	colcon_terminal_notifier.app/Contents/PkgInfo
++# share/colcon_notification/colcon_terminal_notifier.app/Contents/MacOS = 
++# 	colcon_terminal_notifier.app/Contents/MacOS/colcon_terminal_notifier
++# share/colcon_notification/colcon_terminal_notifier.app/Contents/Resources = 
++# 	colcon_terminal_notifier.app/Contents/Resources/colcon.icns
++# share/colcon_notification/colcon_terminal_notifier.app/Contents/Resources/en.lproj = 
++# 	colcon_terminal_notifier.app/Contents/Resources/en.lproj/Credits.rtf
++# 	colcon_terminal_notifier.app/Contents/Resources/en.lproj/InfoPlist.strings
++# 	colcon_terminal_notifier.app/Contents/Resources/en.lproj/MainMenu.nib
  
  [tool:pytest]
  filterwarnings = 
