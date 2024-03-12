@@ -10,9 +10,9 @@ import sys
 from colcon_core.logging import colcon_logger
 from colcon_core.plugin_system import satisfies_version
 from colcon_core.plugin_system import SkipExtensionException
+import colcon_notification
 from colcon_notification.desktop_notification \
     import DesktopNotificationExtensionPoint
-from pkg_resources import iter_entry_points
 
 logger = colcon_logger.getChild(__name__)
 
@@ -34,16 +34,9 @@ class TerminalNotifierDesktopNotification(DesktopNotificationExtensionPoint):
         if message.startswith('-'):
             message = '\\' + message
 
-        entry_points = list(iter_entry_points(
-            'colcon_notification.desktop_notification',
-            name='terminal_notifier'))
-        if not entry_points:
-            logger.error(
-                "Failed to find entry point of 'terminal_notifier'")
-            return
-
         # determine the install prefix of this Python package
-        install_prefix = _get_prefix_path(entry_points[0].dist.location)
+        install_prefix = _get_prefix_path(
+            Path(colcon_notification.__file__).parent.parent)
         if install_prefix is None:
             # for 'develop' the dist location points to the build directory
             # and the prefix path can't be determined
