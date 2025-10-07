@@ -124,3 +124,5 @@ class NotificationWindow:
                 'Failed to delete the notification handle: {e}'
                 .format_map(locals()))
         win32gui.PostQuitMessage(0)
+
+        return 0
