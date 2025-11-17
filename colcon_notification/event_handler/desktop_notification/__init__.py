@@ -32,6 +32,15 @@ class DesktopNotificationEventHandler(EventHandlerExtensionPoint):
         super().__init__()
         satisfies_version(
             EventHandlerExtensionPoint.EXTENSION_POINT_VERSION, '^1.0')
+
+        # default to disabled over SSH
+        self.enabled = not any(
+            os.getenv(var) for var in (
+                'SSH_TTY',
+                'SSH_CLIENT',
+                'SSH_CONNECTION',
+            ))
+
         self._any_stderr_output = False
         self._any_test_failure = False
         self._failed = []
