@@ -2,7 +2,6 @@
 # Licensed under the Apache License, Version 2.0
 
 import sys
-import time
 
 from colcon_core.logging import colcon_logger
 from colcon_core.plugin_system import satisfies_version
@@ -47,6 +46,12 @@ class NotificationWindow:
             logger.debug(
                 'Failed to import win32gui: {e}'.format_map(locals()))
             return
+        try:
+            import win32.timer
+        except ImportError as e:  # noqa: F841
+            logger.debug(
+                'Failed to import win32.timer: {e}'.format_map(locals()))
+            return
 
         wc, class_atom = NotificationWindow._create_window_class()
 
@@ -82,14 +87,16 @@ class NotificationWindow:
                 win32gui.NIM_MODIFY, (
                     hwnd, 0, win32gui.NIF_INFO, win32con.WM_USER + 20, hicon,
                     'Balloon  tooltip', message, 200, title))
+            # wait a while before destroying the window
+            timer_id = win32.timer.set_timer(
+                5000, lambda *_: win32gui.DestroyWindow(hwnd))
         except Exception as e:  # noqa: F841
             logger.debug(
                 'Failed to show the notification: {e}'.format_map(locals()))
-        else:
-            # wait a while before destroying the window
-            time.sleep(5)
-        finally:
             win32gui.DestroyWindow(hwnd)
+        else:
+            win32gui.PumpMessages()
+            win32.timer.kill_timer(timer_id)
 
     _wc = None
     _class_atom = None
