@@ -63,9 +63,9 @@ class StatusEventHandler(EventHandlerExtensionPoint):
             # decorate write methods for stdout / stderr
             # to clear the last status line before other output
             sys.stdout.write = self._write_and_last_clear_status_line(
-                sys.stdout.write)
+                sys.stdout.write, False)
             sys.stdout.buffer.write = self._write_and_last_clear_status_line(
-                sys.stdout.buffer.write)
+                sys.stdout.buffer.write, False)
             sys.stderr.write = self._write_and_last_clear_status_line(
                 sys.stderr.write)
             sys.stderr.buffer.write = self._write_and_last_clear_status_line(
@@ -75,18 +75,21 @@ class StatusEventHandler(EventHandlerExtensionPoint):
             # register exit handle to ensure the last status line is cleared
             atexit.register(self._clear_last_status_line)
 
-    def _write_and_last_clear_status_line(self, func):
+    def _write_and_last_clear_status_line(self, func, flush=True):
         def wrapped_func(*args, **kwargs):
-            self._clear_last_status_line()
+            self._clear_last_status_line(flush)
             return func(*args, **kwargs)
         return wrapped_func
 
-    def _clear_last_status_line(self):
+    def _clear_last_status_line(self, flush=True):
         if self._last_status_line_length is not None:
+            sys.stdout.flush()
             # overwrite last status message with spaces
-            msg = ' ' * self._last_status_line_length + '\r'
+            msg = b' ' * self._last_status_line_length + b'\r'
             self._last_status_line_length = None
-            sys.stdout.write(msg)
+            sys.stdout.buffer.write(msg)
+            if flush:
+                sys.stdout.buffer.flush()
 
     def __call__(self, event):  # noqa: D102
         data = event[0]
