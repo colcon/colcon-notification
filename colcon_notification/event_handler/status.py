@@ -16,8 +16,22 @@ from colcon_core.event.timer import TimerEvent
 from colcon_core.event_handler import EventHandlerExtensionPoint
 from colcon_core.event_handler import format_duration
 from colcon_core.event_reactor import EventReactorShutdown
+from colcon_core.output_style import Style
 from colcon_core.plugin_system import satisfies_version
 from colcon_core.subprocess import SIGINT_RESULT
+
+
+def _len_without_ansi(s):
+    # Split the string by ESC to separate escape codes from text
+    chunks = s.split('\x1b')
+    length = len(chunks[0])
+    for chunk in chunks[1:]:
+        m_idx = chunk.find('m')
+        if m_idx != -1:
+            length += len(chunk) - m_idx - 1
+        else:
+            length += len(chunk)
+    return length
 
 
 class StatusEventHandler(EventHandlerExtensionPoint):
@@ -139,33 +153,37 @@ class StatusEventHandler(EventHandlerExtensionPoint):
             # runtime in seconds
             duration_string = format_duration(
                 now - self._start_time, fixed_decimal_points=1)
-            blocks.append('[{duration_string}]'.format_map(locals()))
+            blocks.append(f'[{Style.Measurement(duration_string)}]')
 
             # number of completed jobs / number of jobs
-            blocks.append(
-                '[%d/%d complete]' %
-                (len(self._ended), self._queued_count))
+            completed_str = (Style.Strong + Style.Success)(
+                str(len(self._ended)))
+            queued_str = Style.Success(str(self._queued_count))
+            blocks.append(f'[{completed_str}/{queued_str} complete]')
 
             # number of failed jobs if not zero
             failed_jobs = [
                 j for j, d in self._ended.items()
                 if d['rc'] and d['rc'] != SIGINT_RESULT]
             if failed_jobs:
-                blocks.append('[%d failed]' % len(failed_jobs))
+                failed_count = Style.Critical(str(len(failed_jobs)))
+                failed_msg = Style.Error(' failed')
+                blocks.append(f'[{failed_count}{failed_msg}]')
 
             # number of ongoing jobs if greater one
             if len(self._running) > 1:
-                blocks.append('[%d ongoing]' % len(self._running))
+                ongoing_str = Style.Success(str(len(self._running)))
+                blocks.append(f'[{ongoing_str} ongoing]')
 
             # job identifier, label and time for ongoing jobs
             for job, d in self._running.items():
-                msg = job.task.context.pkg.name
+                msg = Style.PackageOrJobName(job.task.context.pkg.name)
                 if 'progress' in d:
-                    msg += ':%s' % ' '.join(d['progress'])
+                    msg += ':' + ' '.join(d['progress'])
                 duration_string = format_duration(
                     now - d['start_time'], fixed_decimal_points=1)
-                blocks.append(
-                    '[{msg} - {duration_string}]'.format_map(locals()))
+                duration_str = Style.Measurement(duration_string)
+                blocks.append(f'[{msg} - {duration_str}]')
 
             # determine blocks which fit into terminal width
             max_width = shutil.get_terminal_size().columns
@@ -174,13 +192,13 @@ class StatusEventHandler(EventHandlerExtensionPoint):
                 # append dots when skipping at least one block
                 if i < len(blocks) - 1:
                     msg += ' ...'
-                if len(msg) < max_width:
+                if _len_without_ansi(msg) < max_width:
                     break
             else:
                 return
 
             print(msg, end='\r')
-            self._last_status_line_length = len(msg)
+            self._last_status_line_length = _len_without_ansi(msg)
 
         elif isinstance(data, EventReactorShutdown):
             self._clear_last_status_line()
