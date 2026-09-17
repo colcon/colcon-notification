@@ -16,22 +16,10 @@ from colcon_core.event.timer import TimerEvent
 from colcon_core.event_handler import EventHandlerExtensionPoint
 from colcon_core.event_handler import format_duration
 from colcon_core.event_reactor import EventReactorShutdown
+from colcon_core.output_style import printed_strlen
 from colcon_core.output_style import Style
 from colcon_core.plugin_system import satisfies_version
 from colcon_core.subprocess import SIGINT_RESULT
-
-
-def _len_without_ansi(s):
-    # Split the string by ESC to separate escape codes from text
-    chunks = s.split('\x1b')
-    length = len(chunks[0])
-    for chunk in chunks[1:]:
-        m_idx = chunk.find('m')
-        if m_idx != -1:
-            length += len(chunk) - m_idx - 1
-        else:
-            length += len(chunk)
-    return length
 
 
 class StatusEventHandler(EventHandlerExtensionPoint):
@@ -192,13 +180,13 @@ class StatusEventHandler(EventHandlerExtensionPoint):
                 # append dots when skipping at least one block
                 if i < len(blocks) - 1:
                     msg += ' ...'
-                if _len_without_ansi(msg) < max_width:
+                if printed_strlen(msg) < max_width:
                     break
             else:
                 return
 
             print(msg, end='\r')
-            self._last_status_line_length = _len_without_ansi(msg)
+            self._last_status_line_length = printed_strlen(msg)
 
         elif isinstance(data, EventReactorShutdown):
             self._clear_last_status_line()
